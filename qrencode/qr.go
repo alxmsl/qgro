@@ -1,33 +1,66 @@
 package qrencode
 
+const (
+	ElWhite = iota
+	ElBlack
+	ElBorLT
+	ElBorRT
+	ElBorLB
+	ElBalLT
+	ElBalRT
+	ElBalLB
+	ElBorAl
+	ElBalAl
+)
+
 var (
 	positionDetectionPatternBack = [][]byte{
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
 	}
 
-	positionDetectionPattern = [][]byte{
-		{1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 0, 0, 0, 0, 1},
-		{1, 0, 1, 1, 1, 0, 1},
-		{1, 0, 1, 1, 1, 0, 1},
-		{1, 0, 1, 1, 1, 0, 1},
-		{1, 0, 0, 0, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1},
+	positionDetectionPatternLT = [][]byte{
+		{ElBorLT, ElBorLT, ElBorLT, ElBorLT, ElBorLT, ElBorLT, ElBorLT},
+		{ElBorLT, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElBorLT},
+		{ElBorLT, ElWhite, ElBalLT, ElBalLT, ElBalLT, ElWhite, ElBorLT},
+		{ElBorLT, ElWhite, ElBalLT, ElBalLT, ElBalLT, ElWhite, ElBorLT},
+		{ElBorLT, ElWhite, ElBalLT, ElBalLT, ElBalLT, ElWhite, ElBorLT},
+		{ElBorLT, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElBorLT},
+		{ElBorLT, ElBorLT, ElBorLT, ElBorLT, ElBorLT, ElBorLT, ElBorLT},
+	}
+
+	positionDetectionPatternRT = [][]byte{
+		{ElBorRT, ElBorRT, ElBorRT, ElBorRT, ElBorRT, ElBorRT, ElBorRT},
+		{ElBorRT, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElBorRT},
+		{ElBorRT, ElWhite, ElBalRT, ElBalRT, ElBalRT, ElWhite, ElBorRT},
+		{ElBorRT, ElWhite, ElBalRT, ElBalRT, ElBalRT, ElWhite, ElBorRT},
+		{ElBorRT, ElWhite, ElBalRT, ElBalRT, ElBalRT, ElWhite, ElBorRT},
+		{ElBorRT, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElBorRT},
+		{ElBorRT, ElBorRT, ElBorRT, ElBorRT, ElBorRT, ElBorRT, ElBorRT},
+	}
+
+	positionDetectionPatternLB = [][]byte{
+		{ElBorLB, ElBorLB, ElBorLB, ElBorLB, ElBorLB, ElBorLB, ElBorLB},
+		{ElBorLB, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElBorLB},
+		{ElBorLB, ElWhite, ElBalLB, ElBalLB, ElBalLB, ElWhite, ElBorLB},
+		{ElBorLB, ElWhite, ElBalLB, ElBalLB, ElBalLB, ElWhite, ElBorLB},
+		{ElBorLB, ElWhite, ElBalLB, ElBalLB, ElBalLB, ElWhite, ElBorLB},
+		{ElBorLB, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElBorLB},
+		{ElBorLB, ElBorLB, ElBorLB, ElBorLB, ElBorLB, ElBorLB, ElBorLB},
 	}
 
 	positionAdjustmentPattern = [][]byte{
-		{1, 1, 1, 1, 1},
-		{1, 0, 0, 0, 1},
-		{1, 0, 1, 0, 1},
-		{1, 0, 0, 0, 1},
-		{1, 1, 1, 1, 1},
+		{ElBorAl, ElBorAl, ElBorAl, ElBorAl, ElBorAl},
+		{ElBorAl, ElWhite, ElWhite, ElWhite, ElBorAl},
+		{ElBorAl, ElWhite, ElBalAl, ElWhite, ElBorAl},
+		{ElBorAl, ElWhite, ElWhite, ElWhite, ElBorAl},
+		{ElBorAl, ElBorAl, ElBorAl, ElBorAl, ElBorAl},
 	}
 
 	positionAdjustmentPatternCoordinateTable = [][]int{
@@ -99,7 +132,7 @@ const (
 	typeInfoMaskPattern = 0x5412
 )
 
-func bestMaskPattern(bits *BitVector, version versionNumber, ecLevel ECLevel, grid *BitGrid) int {
+func bestMaskPattern(bits *vector, version versionNumber, ecLevel ECLevel, grid *Grid) int {
 	bestMaskPattern := -1
 	bestPenalty := 0
 	for maskPattern := 0; maskPattern < 8; maskPattern++ {
@@ -116,7 +149,7 @@ func bestMaskPattern(bits *BitVector, version versionNumber, ecLevel ECLevel, gr
 	return bestMaskPattern
 }
 
-func buildGrid(bits *BitVector, version versionNumber, ecLevel ECLevel, maskPattern int, grid *BitGrid) {
+func buildGrid(bits *vector, version versionNumber, ecLevel ECLevel, maskPattern int, grid *Grid) {
 	grid.Clear()
 	embedBasicPatterns(version, grid)
 	embedTypeInfo(ecLevel, maskPattern, grid)
@@ -124,27 +157,27 @@ func buildGrid(bits *BitVector, version versionNumber, ecLevel ECLevel, maskPatt
 	embedDataBits(bits, maskPattern, grid)
 }
 
-func embedBasicPatterns(version versionNumber, grid *BitGrid) {
+func embedBasicPatterns(version versionNumber, grid *Grid) {
 	embedPositionDetectionPatternsAndSeparators(grid)
 	embedDarkDotAtLeftBottomCorner(grid)
 	maybeEmbedPositionAdjustmentPatterns(version, grid)
 	embedTimingPatterns(grid)
 }
 
-func embedPositionDetectionPatternsAndSeparators(grid *BitGrid) {
+func embedPositionDetectionPatternsAndSeparators(grid *Grid) {
 	embedPattern(0, 0, positionDetectionPatternBack, grid)
 	embedPattern(grid.Width()-len(positionDetectionPatternBack[0]), 0, positionDetectionPatternBack, grid)
 	embedPattern(0, grid.Height()-len(positionDetectionPatternBack), positionDetectionPatternBack, grid)
-	embedPattern(0, 0, positionDetectionPattern, grid)
-	embedPattern(grid.Width()-len(positionDetectionPattern[0]), 0, positionDetectionPattern, grid)
-	embedPattern(0, grid.Height()-len(positionDetectionPattern), positionDetectionPattern, grid)
+	embedPattern(0, 0, positionDetectionPatternLT, grid)
+	embedPattern(grid.Width()-len(positionDetectionPatternRT[0]), 0, positionDetectionPatternRT, grid)
+	embedPattern(0, grid.Height()-len(positionDetectionPatternLB), positionDetectionPatternLB, grid)
 }
 
-func embedDarkDotAtLeftBottomCorner(grid *BitGrid) {
+func embedDarkDotAtLeftBottomCorner(grid *Grid) {
 	grid.Set(8, grid.Height()-8, true)
 }
 
-func maybeEmbedPositionAdjustmentPatterns(version versionNumber, grid *BitGrid) {
+func maybeEmbedPositionAdjustmentPatterns(version versionNumber, grid *Grid) {
 	h := len(positionAdjustmentPattern)
 	w := len(positionAdjustmentPattern[h/2])
 	for _, y := range positionAdjustmentPatternCoordinateTable[version] {
@@ -156,15 +189,15 @@ func maybeEmbedPositionAdjustmentPatterns(version versionNumber, grid *BitGrid) 
 	}
 }
 
-func embedPattern(x0, y0 int, pattern [][]byte, grid *BitGrid) {
+func embedPattern(x0, y0 int, pattern [][]byte, grid *Grid) {
 	for y, row := range pattern {
 		for x, v := range row {
-			grid.Set(x0+x, y0+y, v != 0)
+			grid.SetValue(x0+x, y0+y, v)
 		}
 	}
 }
 
-func embedTimingPatterns(grid *BitGrid) {
+func embedTimingPatterns(grid *Grid) {
 	for i := 0; i < grid.Width(); i++ {
 		if grid.Empty(i, 6) {
 			grid.Set(i, 6, i&1 == 0)
@@ -177,7 +210,7 @@ func embedTimingPatterns(grid *BitGrid) {
 	}
 }
 
-func embedTypeInfo(ecLevel ECLevel, maskPattern int, grid *BitGrid) {
+func embedTypeInfo(ecLevel ECLevel, maskPattern int, grid *Grid) {
 	typeInfo := int(ecLevel)<<3 | maskPattern
 	bchCode := calculateBCHCode(typeInfo, typeInfoPoly)
 	typeInfo = (typeInfo<<10 | (bchCode & 0x3ff)) ^ typeInfoMaskPattern
@@ -192,7 +225,7 @@ func embedTypeInfo(ecLevel ECLevel, maskPattern int, grid *BitGrid) {
 	}
 }
 
-func maybeEmbedVersionInfo(version versionNumber, grid *BitGrid) {
+func maybeEmbedVersionInfo(version versionNumber, grid *Grid) {
 	if version < 7 {
 		return
 	}
@@ -207,7 +240,7 @@ func maybeEmbedVersionInfo(version versionNumber, grid *BitGrid) {
 	}
 }
 
-func embedDataBits(bits *BitVector, maskPattern int, grid *BitGrid) {
+func embedDataBits(bits *vector, maskPattern int, grid *Grid) {
 	bitIndex := 0
 	for direction, x, y := -1, grid.Width()-1, grid.Height()-1; x > 0; x, y, direction = x-2, y-direction, -direction {
 		if x == 6 {
@@ -275,11 +308,11 @@ func mask(maskPattern int, x, y int) bool {
 	return false
 }
 
-func maskPenalty(grid *BitGrid) int {
+func maskPenalty(grid *Grid) int {
 	return maskPenaltyRule1(grid) + maskPenaltyRule2(grid) + maskPenaltyRule3(grid) + maskPenaltyRule4(grid)
 }
 
-func maskPenaltyRule1(grid *BitGrid) int {
+func maskPenaltyRule1(grid *Grid) int {
 	penalty := 0
 	for x := 0; x < grid.Width(); x++ {
 		for y, count := 1, 1; y < grid.Height(); y++ {
@@ -312,7 +345,7 @@ func maskPenaltyRule1(grid *BitGrid) int {
 	return penalty
 }
 
-func maskPenaltyRule2(grid *BitGrid) int {
+func maskPenaltyRule2(grid *Grid) int {
 	penalty := 0
 	for y := 1; y < grid.Height(); y++ {
 		for x := 1; x < grid.Width(); x++ {
@@ -325,7 +358,7 @@ func maskPenaltyRule2(grid *BitGrid) int {
 	return penalty
 }
 
-func maskPenaltyRule3(grid *BitGrid) int {
+func maskPenaltyRule3(grid *Grid) int {
 	penalty := 0
 	for y := 0; y < grid.Height(); y++ {
 		for x := 0; x < grid.Width(); x++ {
@@ -380,7 +413,7 @@ func maskPenaltyRule3(grid *BitGrid) int {
 	return penalty
 }
 
-func maskPenaltyRule4(grid *BitGrid) int {
+func maskPenaltyRule4(grid *Grid) int {
 	total := grid.Width() * grid.Height()
 	dark := -total / 2
 	for y := 0; y < grid.Height(); y++ {

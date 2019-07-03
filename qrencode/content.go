@@ -4,11 +4,11 @@ import (
 	"errors"
 )
 
-func stringContentBits(content string, ecLevel ECLevel) (*BitVector, versionNumber, error) {
+func stringContentBits(content string, ecLevel ECLevel) (*vector, versionNumber, error) {
 	if !supportedECLevel(ecLevel) {
 		return nil, versionNumber(0), errors.New("Unrecognized ECLevel")
 	}
-	headerBits := &BitVector{}
+	headerBits := &vector{}
 	mode := getMode(content)
 	if mode == modeByte {
 		headerBits.Append(int(modeECI), 4)
@@ -18,17 +18,17 @@ func stringContentBits(content string, ecLevel ECLevel) (*BitVector, versionNumb
 	return contentBits([]byte(content), ecLevel, mode, headerBits)
 }
 
-func binaryContentBits(content []byte, ecLevel ECLevel) (*BitVector, versionNumber, error) {
+func binaryContentBits(content []byte, ecLevel ECLevel) (*vector, versionNumber, error) {
 	if !supportedECLevel(ecLevel) {
 		return nil, versionNumber(0), errors.New("Unrecognized ECLevel")
 	}
-	headerBits := &BitVector{}
+	headerBits := &vector{}
 	headerBits.Append(int(modeByte), 4)
 	return contentBits(content, ecLevel, modeByte, headerBits)
 }
 
-func contentBits(content []byte, ecLevel ECLevel, mode modeIndicator, headerBits *BitVector) (*BitVector, versionNumber, error) {
-	dataBits := BitVector{}
+func contentBits(content []byte, ecLevel ECLevel, mode modeIndicator, headerBits *vector) (*vector, versionNumber, error) {
+	dataBits := vector{}
 	appendContent(content, mode, &dataBits)
 
 	bitsNeeded := headerBits.Length() + dataBits.Length() + mode.characterCountBits(versionNumber(40))
@@ -37,7 +37,7 @@ func contentBits(content []byte, ecLevel ECLevel, mode modeIndicator, headerBits
 		return nil, version, err
 	}
 
-	headerAndDataBits := &BitVector{}
+	headerAndDataBits := &vector{}
 	headerAndDataBits.AppendBits(*headerBits)
 	headerAndDataBits.Append(len(content), mode.characterCountBits(version))
 	headerAndDataBits.AppendBits(dataBits)
@@ -146,7 +146,7 @@ func alphanumericCode(b byte) (byte, error) {
 	return 0, invalidAlphanumericByte
 }
 
-func appendContent(content []byte, mode modeIndicator, bits *BitVector) {
+func appendContent(content []byte, mode modeIndicator, bits *vector) {
 	switch mode {
 	case modeNumeric:
 		for i := 0; i+2 < len(content); i += 3 {
@@ -210,7 +210,7 @@ func appendContent(content []byte, mode modeIndicator, bits *BitVector) {
 	}
 }
 
-func appendTerminator(capacityBytes int, bits *BitVector) {
+func appendTerminator(capacityBytes int, bits *vector) {
 	capacity := capacityBytes * 8
 	if bits.Length() > capacity {
 		panic("bits.Length() > capacity")

@@ -1,8 +1,6 @@
 package qrencode
 
 import (
-	"image/png"
-	"os"
 	"testing"
 )
 
@@ -45,17 +43,4 @@ func BenchmarkEncode(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Encode("Testing one two three four five six seven eight nine ten eleven twelve thirteen", ECLevelQ)
 	}
-}
-
-func ExampleEncode() {
-	grid, err := Encode("Testing one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty.", ECLevelQ)
-	if err != nil {
-		return
-	}
-	f, err := os.Create("/tmp/qr.png")
-	if err != nil {
-		return
-	}
-	defer f.Close()
-	png.Encode(f, grid.Image(8))
 }
