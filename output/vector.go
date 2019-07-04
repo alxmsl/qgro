@@ -3,6 +3,7 @@ package output
 import (
 	"io"
 
+	svg "github.com/ajstarks/svgo"
 	"github.com/alxmsl/qrencode-go/qrencode"
 )
 
