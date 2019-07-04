@@ -2,27 +2,33 @@ package qrencode
 
 import "bytes"
 
+type cell struct {
+	bool
+	uint8
+}
+
 type Grid struct {
 	width, height int
-	bits          []uint8
+	cells         []cell
 }
 
 func NewGrid(width, height int) *Grid {
-	return &Grid{width, height, make([]uint8, 2*width*height)}
+	return &Grid{width, height, make([]cell, width*height)}
 }
 
 func (g *Grid) Get(x, y int) uint8 {
-	return g.bits[2*(x+y*g.width)+1]
+	return g.cells[x+y*g.width].uint8
 }
 
 func (g *Grid) Set(x, y int, v uint8) {
-	g.bits[2*(x+y*g.width)] = 0x1
-	g.bits[2*(x+y*g.width)+1] = v
+	g.cells[x+y*g.width].bool = true
+	g.cells[x+y*g.width].uint8 = v
 }
 
 func (g *Grid) Clear() {
-	for i, _ := range g.bits {
-		g.bits[i] = 0x0
+	for i := range g.cells {
+		g.cells[i].bool = false
+		g.cells[i].uint8 = 0x0
 	}
 }
 
@@ -39,7 +45,7 @@ func (g *Grid) IsDark(x, y int) bool {
 }
 
 func (g *Grid) IsEmpty(x, y int) bool {
-	return g.bits[2*(x+y*g.width)] == ElWhite
+	return !g.cells[x+y*g.width].bool
 }
 
 func (g *Grid) Height() int {
