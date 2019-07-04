@@ -1,33 +1,66 @@
 package qrencode
 
+const (
+	ElWhite = iota
+	ElBlack
+	ElBorLT
+	ElBorRT
+	ElBorLB
+	ElBalLT
+	ElBalRT
+	ElBalLB
+	ElBorAl
+	ElBalAl
+)
+
 var (
 	positionDetectionPatternBack = [][]byte{
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
+		{ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite},
 	}
 
-	positionDetectionPattern = [][]byte{
-		{1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 0, 0, 0, 0, 1},
-		{1, 0, 1, 1, 1, 0, 1},
-		{1, 0, 1, 1, 1, 0, 1},
-		{1, 0, 1, 1, 1, 0, 1},
-		{1, 0, 0, 0, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1},
+	positionDetectionPatternLT = [][]byte{
+		{ElBorLT, ElBorLT, ElBorLT, ElBorLT, ElBorLT, ElBorLT, ElBorLT},
+		{ElBorLT, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElBorLT},
+		{ElBorLT, ElWhite, ElBalLT, ElBalLT, ElBalLT, ElWhite, ElBorLT},
+		{ElBorLT, ElWhite, ElBalLT, ElBalLT, ElBalLT, ElWhite, ElBorLT},
+		{ElBorLT, ElWhite, ElBalLT, ElBalLT, ElBalLT, ElWhite, ElBorLT},
+		{ElBorLT, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElBorLT},
+		{ElBorLT, ElBorLT, ElBorLT, ElBorLT, ElBorLT, ElBorLT, ElBorLT},
+	}
+
+	positionDetectionPatternRT = [][]byte{
+		{ElBorRT, ElBorRT, ElBorRT, ElBorRT, ElBorRT, ElBorRT, ElBorRT},
+		{ElBorRT, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElBorRT},
+		{ElBorRT, ElWhite, ElBalRT, ElBalRT, ElBalRT, ElWhite, ElBorRT},
+		{ElBorRT, ElWhite, ElBalRT, ElBalRT, ElBalRT, ElWhite, ElBorRT},
+		{ElBorRT, ElWhite, ElBalRT, ElBalRT, ElBalRT, ElWhite, ElBorRT},
+		{ElBorRT, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElBorRT},
+		{ElBorRT, ElBorRT, ElBorRT, ElBorRT, ElBorRT, ElBorRT, ElBorRT},
+	}
+
+	positionDetectionPatternLB = [][]byte{
+		{ElBorLB, ElBorLB, ElBorLB, ElBorLB, ElBorLB, ElBorLB, ElBorLB},
+		{ElBorLB, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElBorLB},
+		{ElBorLB, ElWhite, ElBalLB, ElBalLB, ElBalLB, ElWhite, ElBorLB},
+		{ElBorLB, ElWhite, ElBalLB, ElBalLB, ElBalLB, ElWhite, ElBorLB},
+		{ElBorLB, ElWhite, ElBalLB, ElBalLB, ElBalLB, ElWhite, ElBorLB},
+		{ElBorLB, ElWhite, ElWhite, ElWhite, ElWhite, ElWhite, ElBorLB},
+		{ElBorLB, ElBorLB, ElBorLB, ElBorLB, ElBorLB, ElBorLB, ElBorLB},
 	}
 
 	positionAdjustmentPattern = [][]byte{
-		{1, 1, 1, 1, 1},
-		{1, 0, 0, 0, 1},
-		{1, 0, 1, 0, 1},
-		{1, 0, 0, 0, 1},
-		{1, 1, 1, 1, 1},
+		{ElBorAl, ElBorAl, ElBorAl, ElBorAl, ElBorAl},
+		{ElBorAl, ElWhite, ElWhite, ElWhite, ElBorAl},
+		{ElBorAl, ElWhite, ElBalAl, ElWhite, ElBorAl},
+		{ElBorAl, ElWhite, ElWhite, ElWhite, ElBorAl},
+		{ElBorAl, ElBorAl, ElBorAl, ElBorAl, ElBorAl},
 	}
 
 	positionAdjustmentPatternCoordinateTable = [][]int{
@@ -99,7 +132,7 @@ const (
 	typeInfoMaskPattern = 0x5412
 )
 
-func bestMaskPattern(bits *BitVector, version versionNumber, ecLevel ECLevel, grid *BitGrid) int {
+func bestMaskPattern(bits *vector, version versionNumber, ecLevel ECLevel, grid *Grid) int {
 	bestMaskPattern := -1
 	bestPenalty := 0
 	for maskPattern := 0; maskPattern < 8; maskPattern++ {
@@ -116,7 +149,7 @@ func bestMaskPattern(bits *BitVector, version versionNumber, ecLevel ECLevel, gr
 	return bestMaskPattern
 }
 
-func buildGrid(bits *BitVector, version versionNumber, ecLevel ECLevel, maskPattern int, grid *BitGrid) {
+func buildGrid(bits *vector, version versionNumber, ecLevel ECLevel, maskPattern int, grid *Grid) {
 	grid.Clear()
 	embedBasicPatterns(version, grid)
 	embedTypeInfo(ecLevel, maskPattern, grid)
@@ -124,75 +157,75 @@ func buildGrid(bits *BitVector, version versionNumber, ecLevel ECLevel, maskPatt
 	embedDataBits(bits, maskPattern, grid)
 }
 
-func embedBasicPatterns(version versionNumber, grid *BitGrid) {
+func embedBasicPatterns(version versionNumber, grid *Grid) {
 	embedPositionDetectionPatternsAndSeparators(grid)
 	embedDarkDotAtLeftBottomCorner(grid)
 	maybeEmbedPositionAdjustmentPatterns(version, grid)
 	embedTimingPatterns(grid)
 }
 
-func embedPositionDetectionPatternsAndSeparators(grid *BitGrid) {
+func embedPositionDetectionPatternsAndSeparators(grid *Grid) {
 	embedPattern(0, 0, positionDetectionPatternBack, grid)
 	embedPattern(grid.Width()-len(positionDetectionPatternBack[0]), 0, positionDetectionPatternBack, grid)
 	embedPattern(0, grid.Height()-len(positionDetectionPatternBack), positionDetectionPatternBack, grid)
-	embedPattern(0, 0, positionDetectionPattern, grid)
-	embedPattern(grid.Width()-len(positionDetectionPattern[0]), 0, positionDetectionPattern, grid)
-	embedPattern(0, grid.Height()-len(positionDetectionPattern), positionDetectionPattern, grid)
+	embedPattern(0, 0, positionDetectionPatternLT, grid)
+	embedPattern(grid.Width()-len(positionDetectionPatternRT[0]), 0, positionDetectionPatternRT, grid)
+	embedPattern(0, grid.Height()-len(positionDetectionPatternLB), positionDetectionPatternLB, grid)
 }
 
-func embedDarkDotAtLeftBottomCorner(grid *BitGrid) {
-	grid.Set(8, grid.Height()-8, true)
+func embedDarkDotAtLeftBottomCorner(grid *Grid) {
+	grid.SetDark(8, grid.Height()-8, true)
 }
 
-func maybeEmbedPositionAdjustmentPatterns(version versionNumber, grid *BitGrid) {
+func maybeEmbedPositionAdjustmentPatterns(version versionNumber, grid *Grid) {
 	h := len(positionAdjustmentPattern)
 	w := len(positionAdjustmentPattern[h/2])
 	for _, y := range positionAdjustmentPatternCoordinateTable[version] {
 		for _, x := range positionAdjustmentPatternCoordinateTable[version] {
-			if grid.Empty(x, y) {
+			if grid.IsEmpty(x, y) {
 				embedPattern(x-w/2, y-h/2, positionAdjustmentPattern, grid)
 			}
 		}
 	}
 }
 
-func embedPattern(x0, y0 int, pattern [][]byte, grid *BitGrid) {
+func embedPattern(x0, y0 int, pattern [][]byte, grid *Grid) {
 	for y, row := range pattern {
 		for x, v := range row {
-			grid.Set(x0+x, y0+y, v != 0)
+			grid.Set(x0+x, y0+y, v)
 		}
 	}
 }
 
-func embedTimingPatterns(grid *BitGrid) {
+func embedTimingPatterns(grid *Grid) {
 	for i := 0; i < grid.Width(); i++ {
-		if grid.Empty(i, 6) {
-			grid.Set(i, 6, i&1 == 0)
+		if grid.IsEmpty(i, 6) {
+			grid.SetDark(i, 6, i&1 == 0)
 		}
 	}
 	for i := 0; i < grid.Height(); i++ {
-		if grid.Empty(6, i) {
-			grid.Set(6, i, i&1 == 0)
+		if grid.IsEmpty(6, i) {
+			grid.SetDark(6, i, i&1 == 0)
 		}
 	}
 }
 
-func embedTypeInfo(ecLevel ECLevel, maskPattern int, grid *BitGrid) {
+func embedTypeInfo(ecLevel ECLevel, maskPattern int, grid *Grid) {
 	typeInfo := int(ecLevel)<<3 | maskPattern
 	bchCode := calculateBCHCode(typeInfo, typeInfoPoly)
 	typeInfo = (typeInfo<<10 | (bchCode & 0x3ff)) ^ typeInfoMaskPattern
 	for i := 0; i < 15; i++ {
 		bit := (typeInfo>>uint(i))&1 == 1
-		grid.Set(typeInfoCoordinates[i][0], typeInfoCoordinates[i][1], bit)
+		grid.SetDark(typeInfoCoordinates[i][0], typeInfoCoordinates[i][1], bit)
 		if i < 8 {
-			grid.Set(grid.Width()-i-1, 8, bit)
+			grid.SetDark(grid.Width()-i-1, 8, bit)
 		} else {
-			grid.Set(8, grid.Height()+i-15, bit)
+			grid.SetDark(8, grid.Height()+i-15, bit)
 		}
 	}
 }
 
-func maybeEmbedVersionInfo(version versionNumber, grid *BitGrid) {
+func maybeEmbedVersionInfo(version versionNumber, grid *Grid) {
 	if version < 7 {
 		return
 	}
@@ -201,13 +234,13 @@ func maybeEmbedVersionInfo(version versionNumber, grid *BitGrid) {
 		for j := 0; j < 3; j++ {
 			bit := versionInfo&1 == 1
 			versionInfo >>= 1
-			grid.Set(i, grid.Height()-11+j, bit)
-			grid.Set(grid.Width()-11+j, i, bit)
+			grid.SetDark(i, grid.Height()-11+j, bit)
+			grid.SetDark(grid.Width()-11+j, i, bit)
 		}
 	}
 }
 
-func embedDataBits(bits *BitVector, maskPattern int, grid *BitGrid) {
+func embedDataBits(bits *vector, maskPattern int, grid *Grid) {
 	bitIndex := 0
 	for direction, x, y := -1, grid.Width()-1, grid.Height()-1; x > 0; x, y, direction = x-2, y-direction, -direction {
 		if x == 6 {
@@ -216,7 +249,7 @@ func embedDataBits(bits *BitVector, maskPattern int, grid *BitGrid) {
 		for ; y >= 0 && y < grid.Height(); y += direction {
 			for i := 0; i < 2; i++ {
 				xx := x - i
-				if !grid.Empty(xx, y) {
+				if !grid.IsEmpty(xx, y) {
 					continue
 				}
 				bit := false
@@ -227,7 +260,7 @@ func embedDataBits(bits *BitVector, maskPattern int, grid *BitGrid) {
 				if mask(maskPattern, xx, y) {
 					bit = !bit
 				}
-				grid.Set(xx, y, bit)
+				grid.SetDark(xx, y, bit)
 			}
 		}
 	}
@@ -275,15 +308,15 @@ func mask(maskPattern int, x, y int) bool {
 	return false
 }
 
-func maskPenalty(grid *BitGrid) int {
+func maskPenalty(grid *Grid) int {
 	return maskPenaltyRule1(grid) + maskPenaltyRule2(grid) + maskPenaltyRule3(grid) + maskPenaltyRule4(grid)
 }
 
-func maskPenaltyRule1(grid *BitGrid) int {
+func maskPenaltyRule1(grid *Grid) int {
 	penalty := 0
 	for x := 0; x < grid.Width(); x++ {
 		for y, count := 1, 1; y < grid.Height(); y++ {
-			if grid.Get(x, y) == grid.Get(x, y-1) {
+			if grid.IsDark(x, y) == grid.IsDark(x, y-1) {
 				count++
 				if count == 5 {
 					penalty += 3
@@ -297,7 +330,7 @@ func maskPenaltyRule1(grid *BitGrid) int {
 	}
 	for y := 0; y < grid.Height(); y++ {
 		for x, count := 1, 1; x < grid.Width(); x++ {
-			if grid.Get(x, y) == grid.Get(x-1, y) {
+			if grid.IsDark(x, y) == grid.IsDark(x-1, y) {
 				count++
 				if count == 5 {
 					penalty += 3
@@ -312,12 +345,12 @@ func maskPenaltyRule1(grid *BitGrid) int {
 	return penalty
 }
 
-func maskPenaltyRule2(grid *BitGrid) int {
+func maskPenaltyRule2(grid *Grid) int {
 	penalty := 0
 	for y := 1; y < grid.Height(); y++ {
 		for x := 1; x < grid.Width(); x++ {
-			v := grid.Get(x, y)
-			if v == grid.Get(x-1, y) && v == grid.Get(x-1, y-1) && v == grid.Get(x, y-1) {
+			v := grid.IsDark(x, y)
+			if v == grid.IsDark(x-1, y) && v == grid.IsDark(x-1, y-1) && v == grid.IsDark(x, y-1) {
 				penalty += 3
 			}
 		}
@@ -325,53 +358,53 @@ func maskPenaltyRule2(grid *BitGrid) int {
 	return penalty
 }
 
-func maskPenaltyRule3(grid *BitGrid) int {
+func maskPenaltyRule3(grid *Grid) int {
 	penalty := 0
 	for y := 0; y < grid.Height(); y++ {
 		for x := 0; x < grid.Width(); x++ {
 			if x+6 < grid.Width() &&
-				grid.Get(x, y) &&
-				!grid.Get(x+1, y) &&
-				grid.Get(x+2, y) &&
-				grid.Get(x+3, y) &&
-				grid.Get(x+4, y) &&
-				!grid.Get(x+5, y) &&
-				grid.Get(x+6, y) {
+				grid.IsDark(x, y) &&
+				!grid.IsDark(x+1, y) &&
+				grid.IsDark(x+2, y) &&
+				grid.IsDark(x+3, y) &&
+				grid.IsDark(x+4, y) &&
+				!grid.IsDark(x+5, y) &&
+				grid.IsDark(x+6, y) {
 				if x+10 < grid.Width() &&
-					!grid.Get(x+7, y) &&
-					!grid.Get(x+8, y) &&
-					!grid.Get(x+9, y) &&
-					!grid.Get(x+10, y) {
+					!grid.IsDark(x+7, y) &&
+					!grid.IsDark(x+8, y) &&
+					!grid.IsDark(x+9, y) &&
+					!grid.IsDark(x+10, y) {
 					penalty += 40
 				}
 				if x-4 >= 0 &&
-					!grid.Get(x-4, y) &&
-					!grid.Get(x-3, y) &&
-					!grid.Get(x-2, y) &&
-					!grid.Get(x-1, y) {
+					!grid.IsDark(x-4, y) &&
+					!grid.IsDark(x-3, y) &&
+					!grid.IsDark(x-2, y) &&
+					!grid.IsDark(x-1, y) {
 					penalty += 40
 				}
 			}
 			if y+6 < grid.Height() &&
-				grid.Get(x, y) &&
-				!grid.Get(x, y+1) &&
-				grid.Get(x, y+2) &&
-				grid.Get(x, y+3) &&
-				grid.Get(x, y+4) &&
-				!grid.Get(x, y+5) &&
-				grid.Get(x, y+6) {
+				grid.IsDark(x, y) &&
+				!grid.IsDark(x, y+1) &&
+				grid.IsDark(x, y+2) &&
+				grid.IsDark(x, y+3) &&
+				grid.IsDark(x, y+4) &&
+				!grid.IsDark(x, y+5) &&
+				grid.IsDark(x, y+6) {
 				if y+10 < grid.Height() &&
-					!grid.Get(x, y+7) &&
-					!grid.Get(x, y+8) &&
-					!grid.Get(x, y+9) &&
-					!grid.Get(x, y+10) {
+					!grid.IsDark(x, y+7) &&
+					!grid.IsDark(x, y+8) &&
+					!grid.IsDark(x, y+9) &&
+					!grid.IsDark(x, y+10) {
 					penalty += 40
 				}
 				if y-4 >= 0 &&
-					!grid.Get(x, y-4) &&
-					!grid.Get(x, y-3) &&
-					!grid.Get(x, y-2) &&
-					!grid.Get(x, y-1) {
+					!grid.IsDark(x, y-4) &&
+					!grid.IsDark(x, y-3) &&
+					!grid.IsDark(x, y-2) &&
+					!grid.IsDark(x, y-1) {
 					penalty += 40
 				}
 			}
@@ -380,12 +413,12 @@ func maskPenaltyRule3(grid *BitGrid) int {
 	return penalty
 }
 
-func maskPenaltyRule4(grid *BitGrid) int {
+func maskPenaltyRule4(grid *Grid) int {
 	total := grid.Width() * grid.Height()
 	dark := -total / 2
 	for y := 0; y < grid.Height(); y++ {
 		for x := 0; x < grid.Width(); x++ {
-			if grid.Get(x, y) {
+			if grid.IsDark(x, y) {
 				dark++
 			}
 		}

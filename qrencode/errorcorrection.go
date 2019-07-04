@@ -21,7 +21,7 @@ type blockPair struct {
 	dataBytes, ecBytes []int
 }
 
-func interleaveWithECBytes(bits *BitVector, version versionNumber, ecLevel ECLevel) *BitVector {
+func interleaveWithECBytes(bits *vector, version versionNumber, ecLevel ECLevel) *vector {
 	numTotalBytes := version.totalCodewords()
 	numDataBytes := version.totalCodewords() - ecBlocks[version][ecLevel].totalECCodewords()
 	numRSBlocks := ecBlocks[version][ecLevel].numBlocks()
@@ -80,7 +80,7 @@ func interleaveWithECBytes(bits *BitVector, version versionNumber, ecLevel ECLev
 		panic("numDataBytes != dataBytesOffset")
 	}
 
-	result := &BitVector{}
+	result := &vector{}
 	for i := 0; i < maxNumDataBytes; i++ {
 		for _, block := range blocks {
 			if i < len(block.dataBytes) {

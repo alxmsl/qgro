@@ -2,7 +2,7 @@
 package qrencode
 
 // QR encode the content at the specified error correction level (ecLevel).
-func Encode(content string, ecLevel ECLevel) (*BitGrid, error) {
+func Encode(content string, ecLevel ECLevel) (*Grid, error) {
 	bits, version, err := stringContentBits(content, ecLevel)
 	if err != nil {
 		return nil, err
@@ -11,7 +11,7 @@ func Encode(content string, ecLevel ECLevel) (*BitGrid, error) {
 }
 
 // QR encode the content at the specified error correction level (ecLevel).
-func EncodeBytes(content []byte, ecLevel ECLevel) (*BitGrid, error) {
+func EncodeBytes(content []byte, ecLevel ECLevel) (*Grid, error) {
 	bits, version, err := binaryContentBits(content, ecLevel)
 	if err != nil {
 		return nil, err
@@ -19,9 +19,9 @@ func EncodeBytes(content []byte, ecLevel ECLevel) (*BitGrid, error) {
 	return encode(bits, version, ecLevel)
 }
 
-func encode(bits *BitVector, version versionNumber, ecLevel ECLevel) (*BitGrid, error) {
+func encode(bits *vector, version versionNumber, ecLevel ECLevel) (*Grid, error) {
 	bits = interleaveWithECBytes(bits, version, ecLevel)
-	grid := NewBitGrid(version.dimension(), version.dimension())
+	grid := NewGrid(version.dimension(), version.dimension())
 	maskPattern := bestMaskPattern(bits, version, ecLevel, grid)
 	buildGrid(bits, version, ecLevel, maskPattern, grid)
 	return grid, nil
