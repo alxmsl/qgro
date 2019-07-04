@@ -74,7 +74,7 @@ func (o *ImageOutput) Image(grid *qrencode.Grid) image.Image {
 			x0 := o.block * (x + o.margin)
 			y0 := o.block * (y + o.margin)
 			c := color.White
-			if grid.Get(x, y) {
+			if grid.IsDark(x, y) {
 				c = color.Black
 			}
 			for dy := 0; dy < o.block; dy++ {

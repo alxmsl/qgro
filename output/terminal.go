@@ -56,7 +56,7 @@ func (o *TerminalOutput) Output(grid *qrencode.Grid, w io.Writer) {
 	for i := 0; i < grid.Height(); i++ {
 		write(w, []byte(white))
 		for j := 0; j < grid.Width(); j++ {
-			if grid.Get(j, i) {
+			if grid.IsDark(j, i) {
 				write(w, []byte(black))
 			} else {
 				write(w, []byte(white))

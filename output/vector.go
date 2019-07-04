@@ -58,7 +58,7 @@ func (o *VectorOutput) Output(grid *qrencode.Grid, w io.Writer) {
 	for x := 0; x < grid.Width(); x++ {
 		currX := o.x
 		for y := 0; y < grid.Height(); y++ {
-			o.processor(s, currX, currY, o.block, grid.Value(x, y))
+			o.processor(s, currX, currY, o.block, grid.Get(x, y))
 			currX += o.block
 		}
 		currY += o.block

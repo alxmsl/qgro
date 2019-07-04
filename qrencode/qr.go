@@ -174,7 +174,7 @@ func embedPositionDetectionPatternsAndSeparators(grid *Grid) {
 }
 
 func embedDarkDotAtLeftBottomCorner(grid *Grid) {
-	grid.Set(8, grid.Height()-8, true)
+	grid.SetDark(8, grid.Height()-8, true)
 }
 
 func maybeEmbedPositionAdjustmentPatterns(version versionNumber, grid *Grid) {
@@ -182,7 +182,7 @@ func maybeEmbedPositionAdjustmentPatterns(version versionNumber, grid *Grid) {
 	w := len(positionAdjustmentPattern[h/2])
 	for _, y := range positionAdjustmentPatternCoordinateTable[version] {
 		for _, x := range positionAdjustmentPatternCoordinateTable[version] {
-			if grid.Empty(x, y) {
+			if grid.IsEmpty(x, y) {
 				embedPattern(x-w/2, y-h/2, positionAdjustmentPattern, grid)
 			}
 		}
@@ -192,20 +192,20 @@ func maybeEmbedPositionAdjustmentPatterns(version versionNumber, grid *Grid) {
 func embedPattern(x0, y0 int, pattern [][]byte, grid *Grid) {
 	for y, row := range pattern {
 		for x, v := range row {
-			grid.SetValue(x0+x, y0+y, v)
+			grid.Set(x0+x, y0+y, v)
 		}
 	}
 }
 
 func embedTimingPatterns(grid *Grid) {
 	for i := 0; i < grid.Width(); i++ {
-		if grid.Empty(i, 6) {
-			grid.Set(i, 6, i&1 == 0)
+		if grid.IsEmpty(i, 6) {
+			grid.SetDark(i, 6, i&1 == 0)
 		}
 	}
 	for i := 0; i < grid.Height(); i++ {
-		if grid.Empty(6, i) {
-			grid.Set(6, i, i&1 == 0)
+		if grid.IsEmpty(6, i) {
+			grid.SetDark(6, i, i&1 == 0)
 		}
 	}
 }
@@ -216,11 +216,11 @@ func embedTypeInfo(ecLevel ECLevel, maskPattern int, grid *Grid) {
 	typeInfo = (typeInfo<<10 | (bchCode & 0x3ff)) ^ typeInfoMaskPattern
 	for i := 0; i < 15; i++ {
 		bit := (typeInfo>>uint(i))&1 == 1
-		grid.Set(typeInfoCoordinates[i][0], typeInfoCoordinates[i][1], bit)
+		grid.SetDark(typeInfoCoordinates[i][0], typeInfoCoordinates[i][1], bit)
 		if i < 8 {
-			grid.Set(grid.Width()-i-1, 8, bit)
+			grid.SetDark(grid.Width()-i-1, 8, bit)
 		} else {
-			grid.Set(8, grid.Height()+i-15, bit)
+			grid.SetDark(8, grid.Height()+i-15, bit)
 		}
 	}
 }
@@ -234,8 +234,8 @@ func maybeEmbedVersionInfo(version versionNumber, grid *Grid) {
 		for j := 0; j < 3; j++ {
 			bit := versionInfo&1 == 1
 			versionInfo >>= 1
-			grid.Set(i, grid.Height()-11+j, bit)
-			grid.Set(grid.Width()-11+j, i, bit)
+			grid.SetDark(i, grid.Height()-11+j, bit)
+			grid.SetDark(grid.Width()-11+j, i, bit)
 		}
 	}
 }
@@ -249,7 +249,7 @@ func embedDataBits(bits *vector, maskPattern int, grid *Grid) {
 		for ; y >= 0 && y < grid.Height(); y += direction {
 			for i := 0; i < 2; i++ {
 				xx := x - i
-				if !grid.Empty(xx, y) {
+				if !grid.IsEmpty(xx, y) {
 					continue
 				}
 				bit := false
@@ -260,7 +260,7 @@ func embedDataBits(bits *vector, maskPattern int, grid *Grid) {
 				if mask(maskPattern, xx, y) {
 					bit = !bit
 				}
-				grid.Set(xx, y, bit)
+				grid.SetDark(xx, y, bit)
 			}
 		}
 	}
@@ -316,7 +316,7 @@ func maskPenaltyRule1(grid *Grid) int {
 	penalty := 0
 	for x := 0; x < grid.Width(); x++ {
 		for y, count := 1, 1; y < grid.Height(); y++ {
-			if grid.Get(x, y) == grid.Get(x, y-1) {
+			if grid.IsDark(x, y) == grid.IsDark(x, y-1) {
 				count++
 				if count == 5 {
 					penalty += 3
@@ -330,7 +330,7 @@ func maskPenaltyRule1(grid *Grid) int {
 	}
 	for y := 0; y < grid.Height(); y++ {
 		for x, count := 1, 1; x < grid.Width(); x++ {
-			if grid.Get(x, y) == grid.Get(x-1, y) {
+			if grid.IsDark(x, y) == grid.IsDark(x-1, y) {
 				count++
 				if count == 5 {
 					penalty += 3
@@ -349,8 +349,8 @@ func maskPenaltyRule2(grid *Grid) int {
 	penalty := 0
 	for y := 1; y < grid.Height(); y++ {
 		for x := 1; x < grid.Width(); x++ {
-			v := grid.Get(x, y)
-			if v == grid.Get(x-1, y) && v == grid.Get(x-1, y-1) && v == grid.Get(x, y-1) {
+			v := grid.IsDark(x, y)
+			if v == grid.IsDark(x-1, y) && v == grid.IsDark(x-1, y-1) && v == grid.IsDark(x, y-1) {
 				penalty += 3
 			}
 		}
@@ -363,48 +363,48 @@ func maskPenaltyRule3(grid *Grid) int {
 	for y := 0; y < grid.Height(); y++ {
 		for x := 0; x < grid.Width(); x++ {
 			if x+6 < grid.Width() &&
-				grid.Get(x, y) &&
-				!grid.Get(x+1, y) &&
-				grid.Get(x+2, y) &&
-				grid.Get(x+3, y) &&
-				grid.Get(x+4, y) &&
-				!grid.Get(x+5, y) &&
-				grid.Get(x+6, y) {
+				grid.IsDark(x, y) &&
+				!grid.IsDark(x+1, y) &&
+				grid.IsDark(x+2, y) &&
+				grid.IsDark(x+3, y) &&
+				grid.IsDark(x+4, y) &&
+				!grid.IsDark(x+5, y) &&
+				grid.IsDark(x+6, y) {
 				if x+10 < grid.Width() &&
-					!grid.Get(x+7, y) &&
-					!grid.Get(x+8, y) &&
-					!grid.Get(x+9, y) &&
-					!grid.Get(x+10, y) {
+					!grid.IsDark(x+7, y) &&
+					!grid.IsDark(x+8, y) &&
+					!grid.IsDark(x+9, y) &&
+					!grid.IsDark(x+10, y) {
 					penalty += 40
 				}
 				if x-4 >= 0 &&
-					!grid.Get(x-4, y) &&
-					!grid.Get(x-3, y) &&
-					!grid.Get(x-2, y) &&
-					!grid.Get(x-1, y) {
+					!grid.IsDark(x-4, y) &&
+					!grid.IsDark(x-3, y) &&
+					!grid.IsDark(x-2, y) &&
+					!grid.IsDark(x-1, y) {
 					penalty += 40
 				}
 			}
 			if y+6 < grid.Height() &&
-				grid.Get(x, y) &&
-				!grid.Get(x, y+1) &&
-				grid.Get(x, y+2) &&
-				grid.Get(x, y+3) &&
-				grid.Get(x, y+4) &&
-				!grid.Get(x, y+5) &&
-				grid.Get(x, y+6) {
+				grid.IsDark(x, y) &&
+				!grid.IsDark(x, y+1) &&
+				grid.IsDark(x, y+2) &&
+				grid.IsDark(x, y+3) &&
+				grid.IsDark(x, y+4) &&
+				!grid.IsDark(x, y+5) &&
+				grid.IsDark(x, y+6) {
 				if y+10 < grid.Height() &&
-					!grid.Get(x, y+7) &&
-					!grid.Get(x, y+8) &&
-					!grid.Get(x, y+9) &&
-					!grid.Get(x, y+10) {
+					!grid.IsDark(x, y+7) &&
+					!grid.IsDark(x, y+8) &&
+					!grid.IsDark(x, y+9) &&
+					!grid.IsDark(x, y+10) {
 					penalty += 40
 				}
 				if y-4 >= 0 &&
-					!grid.Get(x, y-4) &&
-					!grid.Get(x, y-3) &&
-					!grid.Get(x, y-2) &&
-					!grid.Get(x, y-1) {
+					!grid.IsDark(x, y-4) &&
+					!grid.IsDark(x, y-3) &&
+					!grid.IsDark(x, y-2) &&
+					!grid.IsDark(x, y-1) {
 					penalty += 40
 				}
 			}
@@ -418,7 +418,7 @@ func maskPenaltyRule4(grid *Grid) int {
 	dark := -total / 2
 	for y := 0; y < grid.Height(); y++ {
 		for x := 0; x < grid.Width(); x++ {
-			if grid.Get(x, y) {
+			if grid.IsDark(x, y) {
 				dark++
 			}
 		}
