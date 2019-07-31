@@ -3,7 +3,7 @@ package output
 import (
 	"io"
 
-	svg "github.com/ajstarks/svgo"
+	"github.com/ajstarks/svgo"
 	"github.com/alxmsl/qrencode-go/qrencode"
 )
 
@@ -25,7 +25,7 @@ type (
 )
 
 var (
-	CircleProcessor = func(s *svg.SVG, x, y, block int, v uint8) {
+	DefaultCircleProcessor = func(s *svg.SVG, x, y, block int, v uint8) {
 		if v == qrencode.ElWhite {
 			s.Circle(x+block/2, y+block/2, block/2, "fill:white;stroke:none")
 		} else {
@@ -33,7 +33,7 @@ var (
 		}
 	}
 
-	RectangleProcessor = func(s *svg.SVG, x, y, block int, v uint8) {
+	DefaultRectangleProcessor = func(s *svg.SVG, x, y, block int, v uint8) {
 		if v == qrencode.ElWhite {
 			s.Rect(x, y, block, block, "fill:white;stroke:none")
 		} else {
