@@ -16,7 +16,7 @@ const (
 
 var (
 	vectorProcessor string
-	vecorBlock      int
+	vectorBlock     int
 
 	vectorCmd = &cobra.Command{
 		Use:   "vector",
@@ -25,9 +25,9 @@ var (
 			var o output.Interface
 			switch vectorProcessor {
 			case processorCircle:
-				o = output.NewVectorOutput(vecorBlock, 0, 0, output.DefaultCircleProcessor, nil)
+				o = output.NewVectorOutput(vectorBlock, 0, 0, output.DefaultCircleProcessor, nil)
 			case processorRectangle:
-				o = output.NewVectorOutput(vecorBlock, 0, 0, output.DefaultRectangleProcessor, nil)
+				o = output.NewVectorOutput(vectorBlock, 0, 0, output.DefaultRectangleProcessor, nil)
 			default:
 				fmt.Println("Invalid vector processor")
 				os.Exit(-1)
@@ -45,6 +45,6 @@ var (
 
 func init() {
 	vectorCmd.PersistentFlags().StringVar(&vectorProcessor, "processor", processorRectangle, "Vector processor: circle, rectangle")
-	vectorCmd.PersistentFlags().IntVar(&vecorBlock, "block", 4, "Vector block size")
+	vectorCmd.PersistentFlags().IntVar(&vectorBlock, "block", 4, "Vector block size")
 	rootCmd.AddCommand(vectorCmd)
 }
